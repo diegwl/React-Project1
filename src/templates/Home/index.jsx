@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { loadPosts } from '../../utils/load-posts';
 import { Posts } from '../../components/Posts';
 import { Button } from '../../components/Button';
+import { TextInput } from '../../components/TextInput';
 
 export class Home extends Component {
   state = {
@@ -38,14 +39,33 @@ export class Home extends Component {
     const { posts, page, postsPerPage, allPosts, searchValue } = this.state;
     const noMorePosts = page + postsPerPage >= allPosts.length;
 
+    const filteredPosts = !!searchValue ? allPosts.filter(post => {
+      return post.title.toLowerCase().includes(searchValue.toLowerCase())
+    }) : posts;
+
     return (
       <section className="container">
-        <input type='search' value={searchValue} onChange={this.handleChange} />
+        <div className="search-container">
+          {!!searchValue &&
+          <h1>Search Value: {searchValue}</h1> 
+          }
 
-        <Posts posts={posts} />
+          <TextInput searchValue={searchValue} handleChange={this.handleChange} />
+        </div>
         
+
+        {filteredPosts.length > 0 && (
+          <Posts posts={filteredPosts} />
+        )}
+        
+        {filteredPosts.length === 0 && (
+          <p>Não existem posts!</p>
+        )}
+
         <div className='button-container'>
-          <Button disabled={noMorePosts} onClick={this.loadMorePosts} text='Load more posts' />
+          {!searchValue && (
+            <Button disabled={noMorePosts} onClick={this.loadMorePosts} text='Load more posts' />
+          )}
         </div>
       </section>
     );
